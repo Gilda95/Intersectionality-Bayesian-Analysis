@@ -14,17 +14,11 @@ library(ROCR)           # it needs for PCP
 library(MCMCvis)        # caterpillar plot (MCMCplot)
 #### loading useful functions ####
 
-setwd('/Users/gildamatteucci/OneDrive - Politecnico di Milano/PROGETTO_BAYESIANA/MCMCmodel')
-
-load('Functions.Rdata')
+load('/Regression_Models/Functions.Rdata')
 
 #### loading the dataset ####
 
-setwd('/home/alessandro/Documents/Bay Project')
-setwd('/Users/gildamatteucci/OneDrive - Politecnico di Milano/PROGETTO_BAYESIANA/DataCleaning_EDA')
-setwd("C:/Users/aless/Desktop/POLIMI/MSC2.1/BAYESIAN/progetto")
-
-work <- read.csv('data_work.csv', header = T)
+work <- read.csv('/Data_Cleaning/data_work.csv', header = T)
 
 
 #### organize dataset ####
@@ -122,8 +116,6 @@ thin <- 10
 
 variable.names <-  c("beta", "theta", 'alpha', "loglik") # parameters that will have their values recorded
 
-setwd('/Users/gildamatteucci/OneDrive - Politecnico di Milano/PROGETTO_BAYESIANA/Github/BLASSO_regression')
-
 # parallel computation
 timer <- proc.time()
 n_cores <- n.chains
@@ -138,10 +130,9 @@ outputRegress <- jags.parfit(cl = cl, data = data, params = variable.names, mode
 stopCluster(cl)
 time.taken <- proc.time() - timer
 
-save(outputRegress, time.taken, file='pdwrkSE_LASSO_output.Rdata')
+save(outputRegress, time.taken, file='/Regression_Models/Lasso_regression/pdwrkSE_LASSO_output.Rdata')
 
-setwd('/Users/gildamatteucci/OneDrive - Politecnico di Milano/PROGETTO_BAYESIANA/Github/BLASSO_regression')
-load('pdwrkSE_LASSO_output.Rdata')
+load('/Regression_Models/Lasso_regression/pdwrkSE_LASSO_output.Rdata')
 
 #### export the results ####
 
