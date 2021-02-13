@@ -26,8 +26,8 @@ STATA SAS and SPSS format available. Use round 9 (2018). All the information on 
 
 ### Data_Cleaning
 
-In this folder you can find two file: *dataset.R* and *data_work.csv*. 
-The first one explains how to reduce the entire ESS9E02 dataset and how to make some changes on the variables that will help you understanding the context. 
+In this folder you can find file *dataset.R*. 
+Thhis explains how to reduce the entire ESS9E02 dataset and how to make some changes on the variables that will help you understanding the context. 
 First of all we chose to focus on the people between the ages of 25 and 55, since we are interested in differences in the labour market opportunities. Then we choose variables that we thought should better explain our problem. After these first steps, we take only people which have full information available for the considered variables.
 New variables are introduced to make dataset more easily interpretable such as: *ctzmod*, *brnmod*, *edutre*. Inside the file some information about how we create these are reported.
 After all these changes, the final result is saved on file *data_work.csv*. Despite the fact we decided to focus on South Europe for our analysis, this file presents all the region across Europe.
