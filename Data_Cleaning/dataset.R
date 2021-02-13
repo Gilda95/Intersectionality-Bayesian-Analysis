@@ -6,8 +6,6 @@ library(haven)
 
 #### loading dataset ####
 
-setwd('/home/alessandro/Documents/Bay Project')
-setwd('/Users/gildamatteucci/OneDrive - Politecnico di Milano/PROGETTO_BAYESIANA/ESS9e02')
 dataset <- read_sas('ess9e02.sas7bdat', NULL)
 
 
@@ -510,8 +508,7 @@ data.exp[data.exp == 9999999999] <- NA
 data.exp <- na.omit(data.exp)
 
 
-setwd('/Users/gildamatteucci/OneDrive - Politecnico di Milano/PROGETTO_BAYESIANA/DataCleaning_EDA')
-write.csv(data.exp, file = "data_work.csv", row.names = FALSE)
+write.csv(data.exp, file = "Data_Cleaning/data_work.csv", row.names = FALSE)
 
 
 
