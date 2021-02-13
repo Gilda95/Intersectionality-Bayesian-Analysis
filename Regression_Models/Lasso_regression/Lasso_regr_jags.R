@@ -14,11 +14,11 @@ library(ROCR)           # it needs for PCP
 library(MCMCvis)        # caterpillar plot (MCMCplot)
 #### loading useful functions ####
 
-load('/Regression_Models/Functions.Rdata')
+load('Regression_Models/Functions.Rdata')
 
 #### loading the dataset ####
 
-work <- read.csv('/Data_Cleaning/data_work.csv', header = T)
+work <- read.csv('Data_Cleaning/data_work.csv', header = T)
 
 
 #### organize dataset ####
@@ -130,9 +130,9 @@ outputRegress <- jags.parfit(cl = cl, data = data, params = variable.names, mode
 stopCluster(cl)
 time.taken <- proc.time() - timer
 
-save(outputRegress, time.taken, file='/Regression_Models/Lasso_regression/pdwrkSE_LASSO_output.Rdata')
+save(outputRegress, time.taken, file='Regression_Models/Lasso_regression/pdwrkSE_LASSO_output.Rdata')
 
-load('/Regression_Models/Lasso_regression/pdwrkSE_LASSO_output.Rdata')
+load('Regression_Models/Lasso_regression/pdwrkSE_LASSO_output.Rdata')
 
 #### export the results ####
 
