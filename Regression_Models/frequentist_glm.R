@@ -2,14 +2,10 @@
 
 #### Loading the dataset ####
 
-setwd('/home/alessandro/Documents/Bay Project')
-setwd('/Users/gildamatteucci/OneDrive - Politecnico di Milano/PROGETTO_BAYESIANA/DataCleaning_EDA')
-setwd("C:/Users/aless/Desktop/POLIMI/MSC2.1/BAYESIAN/progetto")
-
-work <- read.csv('data_work.csv', header = T)
+work <- read.csv('Data_Cleaning/data_work.csv', header = T)
 
 
-#### organize dataset ####
+#### Organize dataset ####
 
 # merging native and autochthonous
 work$ctzmod[work$ctzmod=='native'] <- 'autochthonous'
@@ -35,7 +31,7 @@ work$rgn <- as.factor(work$rgn)
 work$edutre <- as.factor(work$edutre)
 work$eduptre <- as.factor(work$eduptre)
 
-#### choose first factor ####
+# choose first factor
 work$gndr <- relevel(work$gndr, 'male')
 work$ctzmod <- relevel(work$ctzmod, 'autochthonous') 
 work$brnmod <- relevel(work$brnmod, 'Rich')
@@ -72,7 +68,7 @@ immigrant <- ifelse(data$ctzmod == 'immigrant', 1, 0)
 data$agea <- scale(data$agea)
 data$chld14 <- scale(data$chld14)
 
-#### frequentist GLM ####
+#### Frequentist GLM ####
 
 freq_glm <- glm(y ~ 1 + ctzmod + edutre +  agea + chld14 +  prtnr + immigrant:brnmod + 
                 female:(1 + ctzmod + edutre +  agea + chld14 +  prtnr + immigrant:brnmod) +
