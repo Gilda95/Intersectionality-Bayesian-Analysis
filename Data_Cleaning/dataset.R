@@ -6,7 +6,10 @@ library(haven)
 
 #### loading dataset ####
 
-dataset <- read_sas('ess9e02.sas7bdat', NULL)
+# You should download this data from https://www.europeansocialsurvey.org/ 
+# (round 9, 2018 year)
+
+dataset <- read_sas('ESS9e02/ess9e02.sas7bdat', NULL)
 
 
 #### selecting variables of interest ####
@@ -59,7 +62,7 @@ data.sel <- data.sel[(data.sel$agea<=55) & (data.sel$agea>=25), ]
 rm(var.sel)
 
 
-#### uniforming 6, 7, 8, 9 (not answer and/or cannot answer)  ####
+#### uniformizing 6, 7, 8, 9 (not answer and/or cannot answer)  ####
 # 6, ... of ctzcntr
 data.sel$ctzcntr[data.sel$ctzcntr == 6] <- 6666666666
 data.sel$ctzcntr[data.sel$ctzcntr == 7] <- 7777777777
@@ -180,16 +183,16 @@ data.sel$grspnum[(data.sel$cntry == 'GB') & cond] <- data.sel$grspnum[(data.sel$
 
 rm(curr.cz, curr.pl, curr.rs, cond)
 
-#### renominating fvgabc ####
+#### renomination fvgabc ####
 data.sel$fvgabc[data.sel$fvgabc == 1] <- 'Pay'
 data.sel$fvgabc[data.sel$fvgabc == 2] <- 'Pension'
 data.sel$fvgabc[data.sel$fvgabc == 3] <- 'Social benefits'
 
-#### renominating gender #####
+#### renomination gender #####
 data.sel$gndr[data.sel$gndr == 1] <- 'male'
 data.sel$gndr[data.sel$gndr == 2] <- 'female'
 
-#### aggregating isco08 ####
+#### aggregation isco08 ####
 for (i in 0:9) {
   data.sel$isco08[(data.sel$isco08 >= i*1000) & (data.sel$isco08 < (i+1)*1000)] <- i
 }
@@ -205,7 +208,7 @@ data.sel$isco08[data.sel$isco08 == 7] <- 'skilled manual workers'
 data.sel$isco08[data.sel$isco08 == 8] <- 'skilled manual workers'
 data.sel$isco08[data.sel$isco08 == 9] <- 'elementary occupations'
 
-#### aggregating isco08p ####
+#### aggregation isco08p ####
 for (i in 0:9) {
   data.sel$isco08p[(data.sel$isco08p >= i*1000) & (data.sel$isco08p < (i+1)*1000)] <- i
 }
@@ -222,12 +225,12 @@ data.sel$isco08p[data.sel$isco08p == 8] <- 'skilled manual workers'
 data.sel$isco08p[data.sel$isco08p == 9] <- 'elementary occupations'
 
 
-#### renominating ethnic minorities ####
+#### renomination ethnic minorities ####
 data.sel$blgetmg[data.sel$blgetmg == 1] <- 'yes'
 data.sel$blgetmg[data.sel$blgetmg == 2] <- 'no'
 
 
-#### creating variable for citizenship ####
+#### create variable for citizenship ####
 data.sel$ctzmod <- NA
 data.sel$ctzmod[(data.sel$ctzcntr == 1) & (data.sel$brncntr == 1) & (data.sel$blgetmg == 'no')] <- 'autochthonous'
 data.sel$ctzmod[(data.sel$ctzcntr == 1) & (data.sel$brncntr == 2) & (data.sel$blgetmg == 'no')] <- 'native'
@@ -235,7 +238,7 @@ data.sel$ctzmod[((data.sel$ctzcntr == 2) & (data.sel$brncntr == 1)) | ((data.sel
 data.sel$ctzmod[(data.sel$ctzcntr == 2) & (data.sel$brncntr == 2)] <- 'immigrant'
 
 
-#### creating variable for born country ####
+#### create variable for born country ####
 data.sel$brnmod <- NA
 data.sel$cntbrthd[data.sel$brncntr == 1] <- data.sel$cntry[data.sel$brncntr == 1] 
 
@@ -301,7 +304,7 @@ data.sel$ctzcntr <- data.sel$ctzshipd <- data.sel$cntbrthd <- data.sel$brncntr <
 rm(africa, america, antartica, asia, europe, oceania, rich)
 
 
-#### renominating domicil #####
+#### renomination domicil #####
 data.sel$domicil[data.sel$domicil == 1] <- 'Big City'
 data.sel$domicil[data.sel$domicil == 2] <- 'Suburbs or Outskirts of Big City'
 data.sel$domicil[data.sel$domicil == 3] <- 'Small City'
@@ -314,7 +317,7 @@ data.sel$domicil[data.sel$domicil == 5] <- 'Farm or Countryside'
 
 
 
-#### creating variable for educazione ####
+#### create variable for educazione ####
 
 # for the subject
 data.sel$edumod <- NA
@@ -348,7 +351,7 @@ data.sel$edulvlpb <- NULL
 # 87        372       1530       6020        990        936       1899       2219        204
 
 
-#### creating variable for children ####
+#### create variable for children ####
 
 dataset1 <- dataset[(dataset$agea<=55) & (dataset$agea>=25), ]
 data.eta <- dataset1[,c('yrbrn2', 'yrbrn3', 'yrbrn4', 'yrbrn5', 'yrbrn6', 'yrbrn7', 'yrbrn8', 
@@ -386,7 +389,7 @@ for (i in 1:dim(dataset1)[1]) {
 
 rm(n3, n10, n14, i, j, dataset1, data.rel, data.eta, data.year)
 
-#### creating binary variable for partner/no partner ####
+#### create binary variable for partner/no partner ####
 
 dataset1 <- dataset[(dataset$agea<=55) & (dataset$agea>=25), ]
 part.cont <- dataset1[,c('rshipa2', 'rshipa3', 'rshipa4', 'rshipa5', 'rshipa6', 'rshipa7', 'rshipa8', 
@@ -420,7 +423,7 @@ data.sel <- data.sel[data.sel$brnmod != 'Oceania',]
 data.sel <- data.sel[(data.sel$prtnr == 0) | (data.sel$prtnr == 1 & data.sel$edupmod != 6666666666), ]
 
 
-#### creating a variable for region ####
+#### create a variable for region ####
 data.exp <- na.omit(data.exp)
 
 OVEST = c( "AT" , "BE", "CH",  "DE" ,  "FR" , "NL")
@@ -471,7 +474,7 @@ for( i in 1:dim(data.sel)[1] ){
   
 }
 
-#### creating a new variable for education with only 3 levels ####
+#### create a new variable for education with only 3 levels ####
 
 # for subject
 data.sel$edutre <- NULL
@@ -487,7 +490,7 @@ data.sel$eduptre[data.sel$edupmod  == 5 | data.sel$edupmod  == 6 | data.sel$edup
 data.sel$eduptre[data.sel$edupmod  == 6666666666] <- 6666666666
 
 
-#### creating a column for homogamy  ####
+#### create a column for homogamy  ####
 data.sel$omogamia <- NULL
 pippo <- data.sel$edutre - data.sel$eduptre
 data.sel$omogamia[pippo == 0] <- 1 
@@ -508,7 +511,7 @@ data.exp[data.exp == 9999999999] <- NA
 data.exp <- na.omit(data.exp)
 
 
-write.csv(data.exp, file = "Data_Cleaning/data_work.csv", row.names = FALSE)
+#write.csv(data.exp, file = "Data_Cleaning/data_work.csv", row.names = FALSE)
 
 
 
