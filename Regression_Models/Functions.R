@@ -1,17 +1,13 @@
 
-rm(list = ls())
-setwd('/home/alessandro/Documents/Bay Project')
-
-
 # COMPUTE_PCP   -------------------------------------------------------------
 
-compute_pcp_Jackman <- function(dataset, param, obs){
+compute_pcp_Jackman <- function(dataset, param, obs, threshold = mean(obs)){
   # Computes the percentage of correct predictions
   # (as suggested by Jackman's book at page 386)
   # choosing empirical mean of the observations as threshold.
   #
   # CALL:
-  # dataset <- cbind(z, z.female, h)
+  # dataset <- cbind(z, z.female, h)  
   # pcp <- compute_pcp_Jackman(dataset, param, y)
   # 
   # INPUT:
@@ -31,7 +27,9 @@ compute_pcp_Jackman <- function(dataset, param, obs){
   pred <- pnorm(pred) # probit link
   
   # Compute empirical mean
-  threshold <- mean(obs)
+  if(is.na(threshold)){
+    threshold <- mean(obs)
+  }
   
   # Compute PCP
   pcp <- NULL
@@ -173,6 +171,61 @@ compute_error_rates <- function(pred_CI, obs, threshold = NULL){
 }
 
 
+# COMPUTE_ERROR_RATES_PCP -----------------------------------------------------
+
+compute_error_rates_pcp <- function(dataset, param, obs, threshold = NULL){
+  # Computes false/true positive/negative rates and adds them in a matrix
+  # 
+  # CALL:
+  # error_rates <- compute_error_rates(pred, y)
+  #
+  # INPUT:
+  # - pred = output of compute_pred function
+  # - obs = observations of the response
+  # - threshold = a vector of candidate threshold to evaluate
+  #               if not provided, a vector to check any 5% is automatically created
+  #
+  # OUTPUT:
+  # error_rates <- matrix with four columns with the false/true predictions
+  #                and a row for each element in threshold
+  
+  n.obs <- length(obs)
+  n.work <- sum(obs)
+  n.nowork <- n.obs - n.work
+  
+  # It threshold is not provided, evaluate any 5%
+  if(is.null(threshold)){
+    threshold <- seq(0, 1, 0.05)
+  }
+  
+  n.threshold <- length(threshold)
+  
+  error_rates <- matrix(NA, nrow = n.threshold, ncol = 4)
+  for(i in 1:n.threshold){
+    
+    pcp <- compute_pcp_Jackman(dataset, param, obs, threshold[i])
+    
+    # Working (correct prediction)
+    error_rates[i,1] <- sum( (pcp > 0.5) & (obs == 1) ) / n.work
+    
+    # Working (wrong prediction)
+    error_rates[i,2] <- sum( (pcp < 0.5) & (obs == 1) ) / n.work
+    
+    # Not working (correct prediction)
+    error_rates[i,3] <- sum( (pcp > 0.5) & (obs == 0) ) / n.nowork
+    
+    # Not working (wrong prediction)
+    error_rates[i,4] <- sum( (pcp < 0.5) & (obs == 0) ) / n.nowork
+    
+  }
+  
+  colnames(error_rates) <- c('working (correct)', 'working (wrong)', 'NOT working (correct)', 'NOT working (wrong)')
+  
+  return(error_rates)
+  
+}
+
+
 # PLOT_ERROR_RATES -------------------------------------------------------------
 
 plot_error_rates <- function(error_rates, threshold = NULL){
@@ -191,16 +244,14 @@ plot_error_rates <- function(error_rates, threshold = NULL){
   
   par(mfrow = c(1,1))
   plot(threshold, error_rates[,1], type='l', lwd = 2, col = 'green',
-       xlim = c(0, 1), ylim = c(0,1), cex.axis = 2, bty='n', 
-       xlab='', ylab='')
-  mtext("Threshold" , side = 1 , cex=2, line = 3)
-  mtext("Error rates" , side = 2 , cex=2, line = 2.5)
+       xlim = c(0, 1), ylim = c(0,1),
+       xlab='Threshold', ylab='Error rates')
   points(threshold, error_rates[,2], type='l', lwd = 2, col = 'orange')
   points(threshold, error_rates[,3], type='l', lwd = 2, col = 'blue')
   points(threshold, error_rates[,4], type='l', lwd = 2, col = 'red')
   
-  legend(0, 0.8, legend=c('T pos', 'F neg', 'T neg', 'F pos'),
-         col=c('green', 'red', 'blue', 'orange'), lty=1, cex=2)
+  legend(0, 0.4, legend=c('T pos', 'F neg', 'T neg', 'F pos'),
+         col=c('green', 'red', 'blue', 'orange'), lty=1, cex=0.8)
   
 }
 
@@ -262,14 +313,14 @@ find_suspect_indexes <- function(pred_CI, obs, threshold){
 
 # PLOT_SAMPLE_POSTERIOR_CREDIBLE_INTERVALS -------------------------------------------------------------
 
-plot_sample_posterior_credible_intervals <- function(pred_CI, obs, threshold, n.sample, seed = 123, want.index = FALSE){
+plot_sample_posterior_credible_intervals <- function(pred_CI, obs, threshold, n.sample, seed, want.index = FALSE){
   # Computes the percentage of correct predictions
   # (as suggested by Jackman's book at page 386)
   # choosing empirical mean of the observations as threshold.
   #
   # CALL:
   # n.sample <- 500
-  # sample.index <- plot_sample_posterior_credible_intervals(pred_CI, y, threshold, n.sample, want.index=T)
+  # sample.index <- plot_sample_posterior_credible_intervals(pred_int, y, threshold, n.sample, seed = 123, want.index=T)
   # 
   # INPUT:
   # - pred_CI = output of compute_pred_int function
@@ -282,7 +333,9 @@ plot_sample_posterior_credible_intervals <- function(pred_CI, obs, threshold, n.
   # OUTPUT:
   # sample.index = vector storing the indexes selected by the sample
   
-  set.seed(seed)
+  if(!is.na(seed)){
+    set.seed(seed)
+  }
   
   # Select the sample
   n.obs <- length(obs)
@@ -312,7 +365,7 @@ plot_sample_posterior_credible_intervals <- function(pred_CI, obs, threshold, n.
   
   par(mfrow = c(1,1))
   plot(c(1,1), pred_CI.sample[1,], type='l', lwd = 2, col = col.plot[1],
-       xlim = c(1, 1.2*n.sample), ylim = c(0,1),
+       xlim = c(1, n.sample), ylim = c(0,1),
        xlab='', ylab='Posterior predictive interval')
   for(i in 2:n.sample){
     points(c(i,i), pred_CI.sample[i,], type = 'l', lwd = 2, col = col.plot[i])
@@ -320,17 +373,171 @@ plot_sample_posterior_credible_intervals <- function(pred_CI, obs, threshold, n.
   
   # Add line for sample mean
   abline(h=threshold)
-  
-  # Legend
-  legend(n.sample, 0.6, legend=c('uncertain', 'T pos', 'F neg', 'T neg', 'F pos', 'threshold'),
-         col=c('grey', 'green', 'red', 'blue', 'orange', 'black'), lty=1, cex=0.8)
     
   # Return...
   if(want.index){
-    return(sample.index)
+    return(cbind(sample.index, col.plot))
   }
   
 }
+
+
+
+# PERMUTATION_TEST_GLM ----------------------------------------------------
+
+permutation_test_glm <- function(obs, data, link = 'probit', n.permutations = 1000, 
+                                 seed = NA, print_summary = F){
+  # Performs a permutation test for the significativity of each parameter of the model ALONE
+  # (could be extended in principle to check a category, but it would require some work)
+  #
+  # CALL:
+  # glm_formula <- formula(y ~ 1 + ctzmod + edutre + brnmod)
+  # glm_dataset <- data.frame(model.matrix(glm_formula, data = data))
+  # glm_permut <- permutation_test_glm(y, glm_dataset, seed = 123)
+  #
+  # INPUT:
+  # - obs = response vector (BINARY!)
+  # - data = a model matrix already accounting for all interactions and intercept
+  #          (can be generated by model.matrix function in base library)
+  # - link = string with the name of the requested link function
+  #          (by default it provides the result using the probit link function)
+  # - n.permutations = number of requested permutations (1000 by default)
+  # - seed = seed number if you want
+  # - print_summary: set to TRUE if you want the summary automatically printed at the end
+  #
+  # OUTPUT:
+  # results = a list containing the fitted glm with all the covariates,  
+  #           the estimated p-values 
+  #           and the simulated summary statistics (in case you want to plot them)
+  
+  # Set seed if provided
+  if(!is.na(seed)){
+    set.seed(seed)
+  }
+  
+  # Length of the output
+  n.obs <- length(obs)
+  
+  # Number of coefficients of the model
+  n.coefficients <- dim(data)[2]
+  
+  ### Fit the global glm
+  global_model <- glm(y ~ -1 + .,
+                      family = binomial(link = link), 
+                      data = data)
+  
+  # Store the "p-values" for the final p-values computation
+  p_values <- abs(summary(global_model)$coefficients[, 4])
+  
+  
+  ### Perform the actual permutation test fitting n.permutation*n.coefficients glm
+  p.coef <- NULL
+  Tj <- matrix(NA, nrow = n.permutations, ncol = n.coefficients)
+  
+  for(j in 1:n.coefficients) {
+    
+    cat(paste("Checking column", j, "of", n.coefficients, '\n'))
+    
+    T0 <- p_values[j]
+    
+    for(perm in 1:n.permutations) {
+      
+      permutation <- sample(n.obs)
+      
+      # Define a new sataset to fix permutating ONLY feature j
+      # (if feature j is NOT important, this should not affect much the model)
+      data.aux <- data
+      data.aux[, j] <- data.aux[permutation, j]
+      
+      # Fit the new glm and store the sumary statistics
+      temporary_model <- glm(obs ~ ., 
+                             family = binomial(link = "probit"),
+                             data.aux)
+      Tj[perm, j] <- summary(temporary_model)$coefficients[j, 4]
+      
+    }
+    
+    # Compute the p-value
+    p.coef[j] <- sum(T0 > Tj[, j]) / n.permutations
+    
+  }
+  
+  names(p.coef) <- names(p_values)
+  
+  result <- list(model = global_model, p_values = p.coef, T0 = p_values,
+                 statistics = Tj, n.perm = n.permutations, seed = seed)
+  
+  if(print_summary){
+    print_permutation_glm_results(result)
+  }
+  
+  return( result )
+}
+
+
+print_permutation_glm_results <- function(glm_results, decreasing = F){
+  # Prints a summary of the permutation_test_glm output
+  #
+  # CALL:
+  # print_permutation_glm_results(glm_permut, decreasing = T)
+  #
+  # INPUT:
+  # - glm_results: output of permutation_test_glm function
+  # - decreasing: set to TRUE if you want the p-values in decreasing order
+  
+  
+  # Extract the glm permutation test results
+  p.values <- glm_results$p_values
+  n.permutations <- glm_results$n.perm
+  seed <- ifelse(is.na(glm_results$seed), 'no seed specified', glm_results$seed)
+  
+  # Print the p-values
+  cat('Printing summary of the permutation tests results... \n')
+  cat(paste('seed:', seed, '\n'))
+  cat(paste('permutations:', n.permutations, '\n'))
+  if(!decreasing){
+    cat('table with p-values:\n')
+    print(t(rbind(p.values)))
+  }
+  if(decreasing){
+    cat('table with p-values:\n')
+    print(t(rbind(sort(p.values, decreasing = T))))
+  }
+  
+}
+
+
+plot_permutation_glm_results <- function(glm_results, index = NA, par_set = c(1,1)){
+  # Plots an histogram of the summary statistics of the permutation test,
+  # in order to visualize how extreme is the draw
+  #
+  # CALL:
+  # plot_permutation_glm_results(glm_permut)
+  #
+  # INPUT: 
+  # - glm_results: output of permutation_test_glm function
+  # - index: vector containing the index ot the parameters you want to plot
+  #          if not provided, all parameters are plotted
+  # - par_set: vector containing the size of the par (how many plot together?)
+  #            by default, it will use par(mfrow = c(1,1))
+  
+  # Extract the glm permutation test results
+  T0 <- glm_results$T0
+  Tj <- glm_results$statistics
+  
+  # In index is not specified, plot everything
+  if(is.na(index)){
+    index = 1:dim(Tj)[2]
+  }
+  
+  par(mfrow = par_set)
+  for(j in index){
+    hist(Tj[,j], main=names(T0)[j], breaks = 20, xlab ='')
+    abline(v = T0[j], col = 'green', lwd = 3)
+  }
+  
+}
+
 
 
 # EXTRACT_PARAM -----------------------------------------------------------
@@ -533,11 +740,6 @@ meanvar_cat <- function(dataset, dataset.immigrant, dataset.partner, dataset.par
 
 # SAVE FUNCTIONS IN .RData FILE -------------------------------------------
 
+setwd('/Users/gildamatteucci/OneDrive - Politecnico di Milano/PROGETTO_BAYESIANA/Github/Regression_Models')
 save.image(file='Functions.RData')
-
-
-
-
-
-
 
