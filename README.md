@@ -43,6 +43,6 @@ In [`this folder`](Explorative_Data_Analysis) you can find 10 .R files which pre
 
 In [`this folder`](Regression_Models) you can find the regression analysis we have performed, namely:
 1.	Frequentist model to check the importance of each variable in order to make a first selection of the covariates (*frequentist_glm.R*);
-2.	Bayesian Hierarchical GLM through JAGS with Spike and Slab priors using the variables that Frequentist model highlighted ([`Lasso_regression`](Lasso_regression) folder);
-3.	Bayesian Hierarchical GLM through JAGS with Lasso priors using the variables that Frequentist model highlighted ([`SpikeSlab_regression`](SpikeSlab_regression) folder);
-4.	Bayesian Hierarchical GLM through JAGS with the covariates selected through model (2) and (3) ([`Final_regression`](Final_regression) folder). 
+2.	Bayesian Hierarchical GLM through JAGS with Spike and Slab priors using the variables that Frequentist model highlighted ([`Lasso_regression`](Regression_Models/Lasso_regression) folder);
+3.	Bayesian Hierarchical GLM through JAGS with Lasso priors using the variables that Frequentist model highlighted ([`SpikeSlab_regression`](Regression_Models/SpikeSlab_regression) folder);
+4.	Bayesian Hierarchical GLM through JAGS with the covariates selected through model (2) and (3) ([`Final_regression`](Regression_Models/Final_regression) folder). 
