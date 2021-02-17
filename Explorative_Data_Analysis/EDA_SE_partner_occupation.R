@@ -4,12 +4,7 @@
 
 #### load the dataset ####
 
-setwd('/home/alessandro/Documents/Bay Project/new')
-setwd('/Users/gildamatteucci/OneDrive - Politecnico di Milano/PROGETTO_BAYESIANA/DataCleaning_EDA')
-setwd("C:/Users/aless/Desktop/POLIMI/MSC2.1/BAYESIAN/progetto")
-
-
-work <- read.csv('data_work.csv', header = T)
+work <- read.csv('Data_Cleaning/data_work.csv', header = T)
 
 # Focus on south Europe
 work <- work[work$rgn == 'South Europe', ]
@@ -48,6 +43,23 @@ design <- svydesign(ids = ~psu, strata = ~stratum, weights = ~anweight, nest = T
 
 #### isco08p: Employment rate by gender in South Europe ####
 
+
+# for each country:
+partner.occupation.male.country <- partner.occupation.female.country <- NULL
+country <- unique(work$cntry)
+for( cnt in country){
+  partner.occupation.male.cnt.tab <- svytable(~isco08p+pdwrk, subset(design, gndr == 'male' & cntry==cnt))
+  partner.occupation.female.cnt.tab <- svytable(~isco08p+pdwrk, subset(design, gndr == 'female' & cntry==cnt))
+  partner.occupation.male.cnt <- partner.occupation.male.cnt.tab[,2]/rowSums(partner.occupation.male.cnt.tab)*100
+  partner.occupation.female.cnt <- partner.occupation.female.cnt.tab[,2]/rowSums(partner.occupation.female.cnt.tab)*100
+  partner.occupation.male.country <- rbind(partner.occupation.male.country,partner.occupation.male.cnt)
+  partner.occupation.female.country <- rbind(partner.occupation.female.country,partner.occupation.female.cnt)
+}
+rownames(partner.occupation.male.country) <- country
+rownames(partner.occupation.female.country) <- country
+
+
+# overall mean
 partner.occupation.male.tab <- svytable(~isco08p+pdwrk, subset(design, gndr == 'male'))
 partner.occupation.female.tab <- svytable(~isco08p+pdwrk, subset(design, gndr == 'female'))
 partner.occupation.male <- partner.occupation.male.tab[,2]/rowSums(partner.occupation.male.tab)*100
@@ -62,8 +74,8 @@ rm(partner.occupation.male.tab, partner.occupation.female.tab)
 par(mfrow = c(1,1))
 plot(1:5, partner.occupation.male, type = 'o', col = 'dodgerblue3', lwd = 3,
      ylim = c(0,100), xlab = '', ylab = '', xaxt = 'n')
-mtext('Occupation rate in South Europe', side=3, line = 1)
-axis(1, at=1:5, names(partner.occupation.male))
+# mtext('Occupation rate in South Europe', side=3, line = 1)
+axis(1, at=1:5, names(partner.occupation.male), cex.axis = 0.8)
 abline(v=1:5, col = 'lightgrey')
 points(1:5, partner.occupation.female, type = 'o', col = 'red', lwd = 3)
 legend('bottomleft', legend = c('Men', 'Women'), 
@@ -72,15 +84,26 @@ legend('bottomleft', legend = c('Men', 'Women'),
        cex = 1.2,
        bty = 'n')
 
-# COMMENT ......................................................................
-#
-#
-# The two curves seem to be quite similar if we consider only gender
-# 
-# 
-#             => A GENDER BASED DIVISION IN THE MODEL MIGHT NOT BE INTERESTING.
-#
-#
+
+
+
+par(mfrow = c(1,1))
+plot(1:5, partner.occupation.male.country[1,], type = 'o', col = 'lightblue1', lwd = 2,
+     ylim = c(0,100), xlab = '', ylab = '', xaxt = 'n')
+points(1:5, partner.occupation.female.country[1,], type = 'o', col = 'rosybrown1', lwd = 2)
+for (i in 2:length(country)){
+  points(1:5, partner.occupation.male.country[i,], type = 'o', col = 'lightblue1', lwd = 2)
+  points(1:5, partner.occupation.female.country[i,], type = 'o', col = 'rosybrown1', lwd = 2)
+}
+points(1:5, partner.occupation.male, type = 'o', col = 'dodgerblue3', lwd = 3)
+points(1:5, partner.occupation.female, type = 'o', col = 'red', lwd = 3)
+axis(1, at=1:5, names(partner.occupation.male), cex.axis = 0.8)
+abline(v=1:5, col = 'lightgrey')
+legend('bottomleft', legend = c('Men', 'Women'), 
+       fill = c('dodgerblue3','red'), 
+       border = NA, 
+       cex = 1.2,
+       bty = 'n')
 
 
 #### isco08p: Difference between countries WITHOUT GENDER ####
@@ -114,19 +137,6 @@ legend('bottomleft', legend = rownames(partner.occupation.south.NOgender),
        border = NA, 
        cex = 1,
        bty = 'n')
-
-
-# COMMENT ......................................................................
-#
-#
-# Except for elementary occupations, 
-# the other curves seem to differ only for the intercept,
-# meaning that a country only difference might not sussist.
-# 
-#                            => I WOULD NOT CONSIDER A COUNTRY-ONLY DIVISION HERE.
-#
-#
-
 
 
 #### isco08p: Difference between countries WITH GENDER ####
@@ -182,15 +192,5 @@ legend('bottomleft', legend = rownames(partner.occupation.south.female),
        bty = 'n')
 mtext('Occupation rate in South Europe by country', outer = T, side=3, line = -1.5)
 
-
-# COMMENT ......................................................................
-#
-#
-# A gender difference by country seem to exist,
-# but we might have problems with the sample sizes (a lot of 100% are strange)
-# 
-#                     => I WOULD CONSIDER isco08p IN RELATION OF COUNTRY AND GENDER.
-#
-#
 
 rm(cnt)

@@ -4,12 +4,7 @@
 
 #### load the dataset ####
 
-setwd('/home/alessandro/Documents/Bay Project/new')
-setwd('/Users/gildamatteucci/OneDrive - Politecnico di Milano/PROGETTO_BAYESIANA/DataCleaning_EDA')
-setwd("C:/Users/aless/Desktop/POLIMI/MSC2.1/BAYESIAN/progetto")
-
-
-work <- read.csv('data_work.csv', header = T)
+work <- read.csv('Data_Cleaning/data_work.csv', header = T)
 
 # Focus on south Europe
 work <- work[work$rgn == 'South Europe', ]
@@ -56,9 +51,22 @@ work$chld14 <- droplevels(work$chld14)
 design <- svydesign(ids = ~psu, strata = ~stratum, weights = ~anweight, nest = T, 
                     data = work)
 
+# for each country:
+children.male.country <- children.female.country <- NULL
+country <- unique(work$cntry)
+for( cnt in country){
+  children.male.cnt.tab <- svytable(~chld14+pdwrk, subset(design, gndr == 'male' & cntry==cnt))
+  children.female.cnt.tab <- svytable(~chld14+pdwrk, subset(design, gndr == 'female' & cntry==cnt))
+  children.male.cnt <- children.male.cnt.tab[,2]/rowSums(children.male.cnt.tab)*100
+  children.female.cnt <- children.female.cnt.tab[,2]/rowSums(children.female.cnt.tab)*100
+  children.male.country <- rbind(children.male.country,children.male.cnt)
+  children.female.country <- rbind(children.female.country,children.female.cnt)
+}
+rownames(children.male.country) <- country
+rownames(children.female.country) <- country
 
-#### Employment rate by gender in South Europe ####
 
+# overall mean
 children.male.tab <- svytable(~chld14+pdwrk, subset(design, gndr == 'male'))
 children.female.tab <- svytable(~chld14+pdwrk, subset(design, gndr == 'female'))
 children.male <- children.male.tab[,2]/rowSums(children.male.tab)*100
@@ -74,25 +82,31 @@ children.female <- children.female.tab[,2]/rowSums(children.female.tab)*100
 par(mfrow = c(1,1))
 plot(0:k, children.male, type = 'o', col = 'dodgerblue3', lwd = 3,
      ylim = c(0,100), xlab = '', ylab = '', xaxt = 'n')
-mtext('Occupation rate in South Europe', side=3, line = 1)
-axis(1, at=0:k, names(children.male))
+# mtext('Occupation rate in South Europe', side=3, line = 1)
+axis(1, at=0:k, c('0', '1', '2', '3+'))
+# axis(1, at=0:k, names(children.male))
 abline(v=0:k, col = 'lightgrey')
 points(0:k, children.female, type = 'o', col = 'red', lwd = 3)
+
+# con country:
+par(mfrow = c(1,1))
+plot(0:k, children.male.country[1,], type = 'o', col = 'lightblue1', lwd = 2,
+     ylim = c(0,100), xlab = '', ylab = '', xaxt = 'n')
+points(0:k, children.female.country[1,], type = 'o', col = 'rosybrown1', lwd = 2)
+for (i in 2:length(country)){
+  points(0:k, children.male.country[i,], type = 'o', col = 'lightblue1', lwd = 2)
+  points(0:k, children.female.country[i,], type = 'o', col = 'rosybrown1', lwd = 2)}
+points(0:k, children.male, type = 'o', col = 'dodgerblue3', lwd = 3)
+points(0:k, children.female, type = 'o', col = 'red', lwd = 3)
+axis(1, at=0:k, c('0', '1', '2', '3+'))
+abline(v=0:k, col = 'lightgrey')
+mtext('Number of children', side=1, line = 2)
 legend('bottomleft', legend = c('Men', 'Women'), 
        fill = c('dodgerblue3','red'), 
        border = NA, 
        cex = 1.2,
        bty = 'n')
 
-# COMMENT ......................................................................
-#
-#
-# The two behaviors are definitely different.
-# 
-# 
-#           => A GENDER BASED DIVISION IN THE MODEL SEEMS TO BE JUSTIFIED.
-#
-#
 
 
 #### CHLD14: Difference between countries WITHOUT GENDER ####
@@ -122,6 +136,7 @@ rm(tabnostd)
 par(mfrow = c(1,1))
 plot(0:4, children.south.NOgender[1,], type = 'o', col = 'red', lwd = 2,
      ylim = c(0,100), xlab = '', ylab = '', xaxt = 'n')
+
 mtext('Occupation rate in South Europe by country', side=3, line = 1)
 axis(1, at=0:4, colnames(children.south.NOgender))
 abline(v=0:4, col = 'lightgrey')
@@ -134,19 +149,6 @@ legend('bottomleft', legend = rownames(children.south.NOgender),
        border = NA, 
        cex = 1.2,
        bty = 'n')
-
-
-# COMMENT ......................................................................
-#
-#
-# Almost ZERO differences among the countries
-# (except for the "extreme" datum of 4 or more children,
-#  which in my humble opinion is not enough)
-# 
-#                         => I WOULD NOT CONSIDER A COUNTRY-ONLY DIVISION HERE.
-#
-#
-
 
 
 #### CHLD14: Difference between countries WITH GENDER ####
@@ -168,15 +170,6 @@ colnames(children.south.female) <- country
 rm(tabnostd.male, tabnostd.female)
 
 
-
-# PLOT
-
-# colors.south <- c('darkgreen','darkred', 'darkblue', 'darkorange2')
-# barplot(children.south,
-#         ylim = c(0,100),
-#         beside = T,
-#         col = colors.south)
-# title('children ratio of men and women in South Europe')
 
 par(mfrow = c(1,2))
 plot(0:4, children.south.male[1,], type = 'o', col = 'red', lwd = 2,
@@ -210,19 +203,6 @@ legend('bottomleft', legend = rownames(children.south.female),
 mtext('Occupation rate in South Europe by country', outer = T, side=3, line = -1.5)
 
 
-# COMMENT ......................................................................
-#
-#
-# This plot confirms that a gender division is justified,
-# but I still think that a country based division is not much informative.
-#
-# Moreover, I start to think that the 4 children category is not much reliable.
-# 
-#            => I WOULD NOT CONSIDER CHILDREN IN RELATION OF COUNTRY AND GENDER.
-#
-#
-
-
 
 #### CHLD14: Difference between countries WITH citizenship ####
 
@@ -249,16 +229,6 @@ colnames(children.citizenship.female) <- citizenship
 
 rm(tabnostd, tabnostd.male, tabnostd.female)
 
-
-
-# PLOT
-
-# colors.south <- c('darkgreen','darkred', 'darkblue', 'darkorange2')
-# barplot(children.citizenship,
-#         ylim = c(0,100),
-#         beside = T,
-#         col = colors.south)
-# title('children ratio of men and women in South Europe')
 
 par(mfrow = c(1,3))
 plot(1:3, children.citizenship.NOgender[1,], type = 'o', col = 'red', lwd = 2,
@@ -306,17 +276,6 @@ if (k==4){points(1:3, children.citizenship.female[5,], type = 'o', col = 'blue',
 mtext('Occupation rate in South Europe by country', outer = T, side=3, line = -1.5)
 
 
-# COMMENT ......................................................................
-#
-#
-# Same comments as always for the citizenship,
-# which I start to think does not really interact with anything.
-# 
-#           => I WOULD CONSIDER CHILDREN IN RELATION OF GENDER AND citizenship.
-#
-#
-
-
 #### CHLD14: Relationship with partner WITHOUT GENDER ####
 
 children.partner.south.NOgender <- NULL
@@ -331,16 +290,6 @@ rm(tabnostd)
 
 
 
-# PLOT
-
-# colors.south <- c('darkgreen','darkred', 'darkblue', 'darkorange2')
-# barplot(children.partner.south,
-#         ylim = c(0,100),
-#         beside = T,
-#         col = colors.south)
-# title('children.partner ratio of men and women in South Europe')
-
-
 par(mfrow = c(1,1))
 plot(0:k, children.partner.south.NOgender[,1], type = 'o', col = 'red', lwd = 2,
      ylim = c(0,100), xlab = '', ylab = '', xaxt = 'n')
@@ -353,17 +302,6 @@ legend('bottomleft', legend = colnames(children.partner.south.NOgender),
        border = NA, 
        cex = 1.2,
        bty = 'n')
-
-
-# COMMENT ......................................................................
-#
-#
-# If we don't consider the gender, having a partner makes no much difference.
-# 
-#                         => I WOULD NOT CONSIDER A PARTNER-ONLY DIVISION HERE.
-#
-#
-
 
 
 #### CHLD14: Difference between countries WITH GENDER ####
@@ -384,16 +322,6 @@ colnames(children.partner.south.female) <- c('without partner', 'with partner')
 
 rm(tabnostd.male, tabnostd.female)
 
-
-
-# PLOT
-
-# colors.south <- c('darkgreen','darkred', 'darkblue', 'darkorange2')
-# barplot(children.partner.south,
-#         ylim = c(0,100),
-#         beside = T,
-#         col = colors.south)
-# title('children.partner ratio of men and women in South Europe')
 
 par(mfrow = c(1,2))
 plot(0:k, children.partner.south.male[,1], type = 'o', col = 'red', lwd = 2,
@@ -420,16 +348,6 @@ legend('bottomleft', legend = colnames(children.partner.south.female),
        bty = 'n')
 mtext('Occupation rate in South Europe by country', outer = T, side=3, line = -1.5)
 
-
-# COMMENT ......................................................................
-#
-#
-# The presence of a partner clearly plays a role here in terms of gender difference.
-# 
-#            => I WOULD CONSIDER CHILDREN IN RELATION OF COUNTRY, PARTNER AND GENDER.
-#               BUT HOW? SEPARATELY OR IN A NESTED WAY?
-#
-#
 
 rm(cnt, ctz, prt)
 

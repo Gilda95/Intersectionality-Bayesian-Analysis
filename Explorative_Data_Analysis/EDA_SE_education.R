@@ -4,12 +4,7 @@
 
 #### load the dataset ####
 
-setwd('/home/alessandro/Documents/Bay Project/new')
-setwd('/Users/gildamatteucci/OneDrive - Politecnico di Milano/PROGETTO_BAYESIANA/DataCleaning_EDA')
-setwd("C:/Users/aless/Desktop/POLIMI/MSC2.1/BAYESIAN/progetto")
-
-
-work <- read.csv('data_work.csv', header = T)
+work <- read.csv('Data_Cleaning/data_work.csv', header = T)
 
 # Focus on south Europe
 work <- work[work$rgn == 'South Europe', ]
@@ -41,6 +36,22 @@ design <- svydesign(ids = ~psu, strata = ~stratum, weights = ~anweight, nest = T
 
 #### Employment rate by gender in South Europe ####
 
+# for each country:
+education.male.country <- education.female.country <- NULL
+country <- unique(work$cntry)
+for( cnt in country){
+  education.male.cnt.tab <- svytable(~edutre+pdwrk, subset(design, gndr == 'male' & cntry==cnt))
+  education.female.cnt.tab <- svytable(~edutre+pdwrk, subset(design, gndr == 'female' & cntry==cnt))
+  education.male.cnt <- education.male.cnt.tab[,2]/rowSums(education.male.cnt.tab)*100
+  education.female.cnt <- education.female.cnt.tab[,2]/rowSums(education.female.cnt.tab)*100
+  education.male.country <- rbind(education.male.country,education.male.cnt)
+  education.female.country <- rbind(education.female.country,education.female.cnt)
+}
+rownames(education.male.country) <- country
+rownames(education.female.country) <- country
+
+
+# overall mean:
 education.male.tab <- svytable(~edutre+pdwrk, subset(design, gndr == 'male'))
 education.female.tab <- svytable(~edutre+pdwrk, subset(design, gndr == 'female'))
 education.male <- education.male.tab[,2]/rowSums(education.male.tab)*100
@@ -62,7 +73,7 @@ rm(education.male.tab, education.female.tab)
 par(mfrow = c(1,1))
 plot(1:3, education.male, type = 'o', col = 'dodgerblue3', lwd = 3,
      ylim = c(0,100), xlab = '', ylab = '', xaxt = 'n')
-mtext('Occupation rate in South Europe', side=3, line = 1)
+# mtext('Occupation rate in South Europe', side=3, line = 1)
 axis(1, at=1:3, names(education.male))
 abline(v=1:3, col = 'lightgrey')
 points(1:3, education.female, type = 'o', col = 'red', lwd = 3)
@@ -72,16 +83,26 @@ legend('bottomleft', legend = c('Men', 'Women'),
        cex = 1.2,
        bty = 'n')
 
-# COMMENT ......................................................................
-#
-#
-# We can clearly see an overall trend,
-# and we can clearly see that a higher level of education reduces the differences.
-# 
-# 
-#           => A GENDER BASED DIVISION IN THE MODEL SEEMS TO BE JUSTIFIED.
-#
-#
+
+par(mfrow = c(1,1))
+plot(1:3, education.male.country[1,], type = 'o', col = 'lightblue1', lwd = 2,
+     ylim = c(0,100), xlab = '', ylab = '', xaxt = 'n')
+points(1:3, education.female.country[1,], type = 'o', col = 'rosybrown1', lwd = 2)
+for (i in 2:length(country)){
+  points(1:3, education.male.country[i,], type = 'o', col = 'lightblue1', lwd = 2)
+  points(1:3, education.female.country[i,], type = 'o', col = 'rosybrown1', lwd = 2)
+}
+points(1:3, education.male, type = 'o', col = 'dodgerblue3', lwd = 3)
+points(1:3, education.female, type = 'o', col = 'red', lwd = 3)
+# mtext('Occupation rate in South Europe', side=3, line = 1)
+mtext('Education levels', side=1, line = 2)
+axis(1, at=1:3, names(education.male))
+abline(v=1:3, col = 'lightgrey')
+legend('bottomleft', legend = c('Men', 'Women'), 
+       fill = c('dodgerblue3','red'), 
+       border = NA, 
+       cex = 1.2,
+       bty = 'n')
 
 
 #### EDUTRE: Difference between countries WITHOUT GENDER ####
@@ -121,19 +142,6 @@ legend('bottomleft', legend = rownames(education.south.NOgender),
        border = NA, 
        cex = 1.2,
        bty = 'n')
-
-
-# COMMENT ......................................................................
-#
-#
-# If we don't consider a gender division, 
-# we only observe a fluctuation for the lowest level of education in Italy,
-# while the rest seems to be fairly constant in changing the countries.
-# 
-#             => I DON'T KNOW IF I WOULD CONSIDER A COUNTRY-ONLY DIVISION HERE.
-#
-#
-
 
 
 #### EDUTRE: Difference between countries WITH GENDER ####
@@ -191,18 +199,6 @@ legend('bottomleft', legend = rownames(education.south.female),
        cex = 1.2,
        bty = 'n')
 mtext('Occupation rate in South Europe by country', outer = T, side=3, line = -1.5)
-
-
-# COMMENT ......................................................................
-#
-#
-# This plot confirms that a gender division is justified,
-# moreover it suggests that on level 1 the country should be important for women.
-# 
-#                => I WOULD CONSIDER EDUCATION IN RELATION OF COUNTRY AND GENDER.
-#
-#
-
 
 
 #### EDUTRE: Difference between countries WITH citizenship ####
@@ -280,20 +276,6 @@ legend('bottomleft', legend = rownames(education.citizenship.female),
        bty = 'n')
 mtext('Occupation rate in South Europe by country', outer = T, side=3, line = -1.5)
 
-
-# COMMENT ......................................................................
-#
-#
-# Note that different citizenship status seem to lead to different
-# opportunities even id the level of education is the same.
-#
-# Is this difference to be considered an interaction 
-# or it is only a matter of difference in citizenship?
-# 
-#           => I WOULD CONSIDER EDUCATION IN RELATION OF GENDER AND citizenship.
-#              MOREOVER, I WOULD NOT DISCARD THE POSSIBILITY OF A 3 LEVEL GROUP
-#              CONSIDERING THE COUNTRY AS WELL, AT LEAST IN THE FREQUENTIST MODELS.
-#
 
 rm(cnt, ctz)
 

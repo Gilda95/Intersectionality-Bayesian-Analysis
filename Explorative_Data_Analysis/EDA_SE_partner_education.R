@@ -2,12 +2,7 @@
 
 #### load the dataset ####
 
-setwd('/home/alessandro/Documents/Bay Project/new')
-setwd('/Users/gildamatteucci/OneDrive - Politecnico di Milano/PROGETTO_BAYESIANA/DataCleaning_EDA')
-setwd("C:/Users/aless/Desktop/POLIMI/MSC2.1/BAYESIAN/progetto")
-
-
-work <- read.csv('data_work.csv', header = T)
+work <- read.csv('Data_Cleaning/data_work.csv', header = T)
 
 # Focus on south Europe
 work <- work[work$rgn == 'South Europe', ]
@@ -75,17 +70,6 @@ legend('bottomleft', legend = c('Men', 'Women'),
        cex = 1.2,
        bty = 'n')
 
-# COMMENT ......................................................................
-#
-#
-# We can clearly see an overall trend,
-# and we can clearly see that a higher level of education reduces the differences.
-# 
-# 
-#           => A GENDER BASED DIVISION IN THE MODEL SEEMS TO BE JUSTIFIED.
-#
-#
-
 
 #### eduptre: Difference between countries WITHOUT GENDER ####
 
@@ -98,7 +82,6 @@ for( cnt in country){
 colnames(partner.education.south.NOgender) <- country
 
 rm(tabnostd)
-
 
 
 # PLOT
@@ -124,19 +107,6 @@ legend('bottomleft', legend = rownames(partner.education.south.NOgender),
        border = NA, 
        cex = 1.2,
        bty = 'n')
-
-
-# COMMENT ......................................................................
-#
-#
-# If we don't consider a gender division, 
-# we only observe a fluctuation for the lowest level of education in Italy,
-# while the rest seems to be fairly constant in changing the countries.
-# 
-#             => I DON'T KNOW IF I WOULD CONSIDER A COUNTRY-ONLY DIVISION HERE.
-#
-#
-
 
 
 #### eduptre: Difference between countries WITH GENDER ####
@@ -194,18 +164,6 @@ legend('bottomleft', legend = rownames(partner.education.south.female),
        cex = 1.2,
        bty = 'n')
 mtext('Occupation rate in South Europe by country', outer = T, side=3, line = -1.5)
-
-
-# COMMENT ......................................................................
-#
-#
-# This plot confirms that a gender division is justified,
-# moreover it suggests that on level 1 the country should be important for women.
-# 
-#                => I WOULD CONSIDER EDUCATION IN RELATION OF COUNTRY AND GENDER.
-#
-#
-
 
 
 #### eduptre: Difference between countries WITH CITIZIENSHIP ####
@@ -283,20 +241,6 @@ legend('bottomleft', legend = rownames(partner.education.citizienship.female),
        bty = 'n')
 mtext('Occupation rate in South Europe by country', outer = T, side=3, line = -1.5)
 
-
-# COMMENT ......................................................................
-#
-#
-# Note that different citizienship status seem to lead to different
-# opportunities even id the level of education is the same.
-#
-# Is this difference to be considered an interaction 
-# or it is only a matter of difference in citizienship?
-# 
-#           => I WOULD CONSIDER EDUCATION IN RELATION OF GENDER AND CITIZIENSHIP.
-#              MOREOVER, I WOULD NOT DISCARD THE POSSIBILITY OF A 3 LEVEL GROUP
-#              CONSIDERING THE COUNTRY AS WELL, AT LEAST IN THE FREQUENTIST MODELS.
-#
 
 rm(cnt, ctz)
 

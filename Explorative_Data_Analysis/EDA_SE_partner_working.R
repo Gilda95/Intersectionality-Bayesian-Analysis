@@ -4,12 +4,7 @@
 
 #### load the dataset ####
 
-setwd('/home/alessandro/Documents/Bay Project/new')
-setwd('/Users/gildamatteucci/OneDrive - Politecnico di Milano/PROGETTO_BAYESIANA/DataCleaning_EDA')
-setwd("C:/Users/aless/Desktop/POLIMI/MSC2.1/BAYESIAN/progetto")
-
-
-work <- read.csv('data_work.csv', header = T)
+work <- read.csv('Data_Cleaning/data_work.csv', header = T)
 
 # Focus on south Europe
 work <- work[work$rgn == 'South Europe', ]
@@ -73,18 +68,6 @@ legend('topright', legend = c('partner.working employed', 'partner.working unemp
        cex = 1.2,
        bty = 'n')
 
-# COMMENT ......................................................................
-#
-#
-# Here, I don't see much difference in terms of the two categories:
-# both men and women have a 10/15% drop, but the major differences
-# are just gender based, not related with this covariate.
-# 
-# 
-#             => A GENDER BASED DIVISION IN THE MODEL MIGHT NOT BE INTERESTING.
-#
-#
-
 
 #### PDWRKP: Difference between countries WITHOUT GENDER ####
 
@@ -108,17 +91,6 @@ barplot(partner.working.south.NOgender,
         beside = T,
         col = c('red', 'darkgreen'))
 mtext('Occupation rate in South Europe by country', side=3, line = 1)
-
-
-# COMMENT ......................................................................
-#
-#
-# Again, except for Portugal, the rest of the countries seem to behave the same.
-# 
-#                            => I WOULD NOT CONSIDER A COUNTRY-ONLY DIVISION HERE.
-#
-#
-
 
 
 #### PDWRKP: Difference between countries WITH GENDER ####
@@ -155,17 +127,6 @@ barplot(partner.working.south.female,
         col = c('red', 'darkgreen'))
 mtext('Women', side=3, line = 0)
 mtext('Occupation rate in South Europe by country', outer=T, side=3, line = -1.5)
-
-
-# COMMENT ......................................................................
-#
-#
-# This is more interesting, as women tend to vary a lot between different countries
-# 
-#                     => I WOULD CONSIDER PDWRKP IN RELATION OF COUNTRY AND GENDER.
-#
-#
-
 
 
 #### PDWRKP: Difference between countries WITH citizenship ####
@@ -210,17 +171,6 @@ barplot(partner.working.citizenship.female,
 mtext('Women', side=3, line = 0)
 mtext('Occupation rate in South Europe by citizenship status', outer=T, side=3, line = -1.5)
 
-
-# COMMENT ......................................................................
-#
-#
-# In this case the differences in term of citizenship
-# are not that important to me.
-#
-# 
-#                => I WOULD CONSIDER PDWRKP IN RELATION OF GENDER AND COUNTRY.
-#
-#
 
 rm(cnt, ctz)
 

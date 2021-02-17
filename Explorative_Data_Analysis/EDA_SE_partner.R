@@ -4,12 +4,7 @@
 
 #### load the dataset ####
 
-setwd('/home/alessandro/Documents/Bay Project/new')
-setwd('/Users/gildamatteucci/OneDrive - Politecnico di Milano/PROGETTO_BAYESIANA/DataCleaning_EDA')
-setwd("C:/Users/aless/Desktop/POLIMI/MSC2.1/BAYESIAN/progetto")
-
-
-work <- read.csv('data_work.csv', header = T)
+work <- read.csv('Data_Cleaning/data_work.csv', header = T)
 
 # Focus on south Europe
 work <- work[work$rgn == 'South Europe', ]
@@ -59,25 +54,28 @@ par(mfrow = c(1,1))
 barplot(partner,
         ylim = c(0,100),
         beside = T,
-        col = c('red', 'darkgreen'))
-mtext('Occupation rate in South Europe', side=3, line = 1)
+        col = c('red', 'dodgerblue3'))
+#mtext('Occupation rate in South Europe', side=3, line = 1)
 legend('topright', legend = c('Without partner', 'With partner'), 
-       fill = c('red','darkgreen'), 
+       fill = c('red','dodgerblue3'), 
        border = NA, 
        cex = 1.2,
        bty = 'n')
 
-# COMMENT ......................................................................
-#
-#
-# I find it difficult to comment on this plot,
-# but the main difference between men and women in south Europe
-# seems to occur when they have a partner, so gender seems important here.
-# 
-# 
-#           => A GENDER BASED DIVISION IN THE MODEL SEEMS TO BE JUSTIFIED.
-#
-#
+
+
+par(mfrow = c(1,1))
+barplot(partner,
+        ylim = c(0,100),
+        beside = T,
+        col = c('lightblue1', 'blue', 'rosybrown1', 'red'))
+#mtext('Occupation rate in South Europe', side=3, line = 1)
+legend('topright', legend = c('male without partner', 'male with partner', 
+                              'female without partner', 'female with partner'), 
+       fill =c('lightblue1', 'blue', 'rosybrown1', 'red'), 
+       border = NA, 
+       cex = 1.2,
+       bty = 'n')
 
 
 #### PRTNR: Difference between countries WITHOUT GENDER ####
@@ -102,17 +100,6 @@ barplot(partner.south.NOgender,
         beside = T,
         col = c('red', 'darkgreen'))
 mtext('Occupation rate in South Europe by country', side=3, line = 1)
-
-
-# COMMENT ......................................................................
-#
-#
-# In general, the difference among the countries seems to be in an absolute sense,
-# and not in the interaction with having a partner.
-# 
-#                            => I WOULD NOT CONSIDER A COUNTRY-ONLY DIVISION HERE.
-#
-#
 
 
 
@@ -150,18 +137,6 @@ barplot(partner.south.female,
         col = c('red', 'darkgreen'))
 mtext('Women', side=3, line = 0)
 mtext('Occupation rate in South Europe by country', outer=T, side=3, line = -1.5)
-
-
-# COMMENT ......................................................................
-#
-#
-# Again, the two genders are treated differently,
-# but such treatment doesn't seem to differ much across the countries.
-# 
-#             => I WOULD NOT CONSIDER PARTNER IN RELATION OF COUNTRY AND GENDER.
-#
-#
-
 
 
 #### PRTNR: Difference between countries WITH citizenship ####
@@ -206,26 +181,6 @@ barplot(partner.citizenship.female,
 mtext('Women', side=3, line = 0)
 mtext('Occupation rate in South Europe by citizenship status', outer=T, side=3, line = -1.5)
 
-
-# COMMENT ......................................................................
-#
-#
-# Note that different citizenship status seem to lead to different
-# opportunities when having or not having a partner.
-#
-# In particular, notice the really low percentage of immigrant women 
-# with a partner and working.
-#
-# Notice that it is not completely clear at this point if the difference
-# induced by the citizenship status here is just because of its importnace
-# or because of an interaction, a real analysis is yet to be performed!
-#
-# 
-#           => I WOULD CONSIDER PARTNER IN RELATION OF GENDER AND citizenship.
-#              HOWEVER, HERE I WOULD DISCARD THE POSSIBILITY OF A 3 LEVEL GROUP
-#              DISCARDING A COUNTRY DIVISION FOR THIS PARAMETER.
-#
-#
 
 rm(cnt, ctz)
 

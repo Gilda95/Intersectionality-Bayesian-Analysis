@@ -4,12 +4,7 @@
 
 #### load the dataset ####
 
-setwd('/home/alessandro/Documents/Bay Project/new')
-setwd('/Users/gildamatteucci/OneDrive - Politecnico di Milano/PROGETTO_BAYESIANA/DataCleaning_EDA')
-setwd("C:/Users/aless/Desktop/POLIMI/MSC2.1/BAYESIAN/progetto")
-
-
-work <- read.csv('data_work.csv', header = T)
+work <- read.csv('Data_Cleaning/data_work.csv', header = T)
 
 # Focus on south Europe
 work <- work[work$rgn == 'South Europe', ]
@@ -58,11 +53,16 @@ rm(domicil.male.tab, domicil.female.tab)
 #         col = colors.south)
 # title('domicil ratio of men and women in South Europe')
 
+lab <- names(domicil.male)
+lab[5] <- 'Suburbs'
+lab[3] <- 'Countryside'
+
 par(mfrow = c(1,1))
 plot(1:5, domicil.male, type = 'o', col = 'dodgerblue3', lwd = 3,
      ylim = c(0,100), xlab = '', ylab = '', xaxt = 'n')
-mtext('Occupation rate in South Europe', side=3, line = 1)
-axis(1, at=1:5, names(domicil.male))
+# mtext('Occupation rate in South Europe', side=3, line = 1)
+# axis(1, at=1:5, names(domicil.male))
+axis(1, at=1:5, lab)
 abline(v=1:5, col = 'lightgrey')
 points(1:5, domicil.female, type = 'o', col = 'red', lwd = 3)
 legend('bottomleft', legend = c('Men', 'Women'), 
@@ -70,16 +70,6 @@ legend('bottomleft', legend = c('Men', 'Women'),
        border = NA, 
        cex = 1.2,
        bty = 'n')
-
-# COMMENT ......................................................................
-#
-#
-# There seems to be some difference, but it is not much clear
-# 
-# 
-#                            => A GENDER BASED DIVISION MAYBE CAN BE JUSTIFIED.
-#
-#
 
 
 #### domicil: Difference between countries WITHOUT GENDER ####
@@ -119,18 +109,6 @@ legend('bottomleft', legend = rownames(domicil.south.NOgender),
        border = NA, 
        cex = 1.2,
        bty = 'n')
-
-
-# COMMENT ......................................................................
-#
-#
-# Except for Cyprus, which has some missing data,
-# the other curves are pretty much the same
-# 
-#                          => I WOULD NOT CONSIDER A COUNTRY-ONLY DIVISION HERE.
-#
-#
-
 
 
 #### domicil: Difference between countries WITH GENDER ####
@@ -188,18 +166,6 @@ legend('bottomleft', legend = rownames(domicil.south.female),
        cex = 1.2,
        bty = 'n')
 mtext('Occupation rate in South Europe by country', outer = T, side=3, line = -1.5)
-
-
-# COMMENT ......................................................................
-#
-#
-# The curves are somehow different, but this difference is much on the intercept
-# so I think the country alone is responsible (not an interaction)
-# 
-#              => I WOULD NOT CONSIDER domicil IN RELATION OF COUNTRY AND GENDER.
-#
-#
-
 
 
 #### domicil: Difference between countries WITH CITIZIENSHIP ####
@@ -276,16 +242,6 @@ legend('bottomleft', legend = rownames(domicil.citizienship.female),
        cex = 1.2,
        bty = 'n')
 mtext('Occupation rate in South Europe by country', outer = T, side=3, line = -1.5)
-
-
-# COMMENT ......................................................................
-#
-#
-# As always with the citizienship, women are different from men,
-# but here I don't know if I would consider this as an interaction.
-# 
-#                        => I WOULD CONSIDER domicil IN RELATION OF GENDER ONLY.
-#
 
 
 rm(cnt, ctz)

@@ -2,12 +2,7 @@
 
 #### load the dataset ####
 
-setwd('/home/alessandro/Documents/Bay Project/new')
-setwd('/Users/gildamatteucci/OneDrive - Politecnico di Milano/PROGETTO_BAYESIANA/DataCleaning_EDA')
-setwd("C:/Users/aless/Desktop/POLIMI/MSC2.1/BAYESIAN/progetto")
-
-
-work <- read.csv('data_work.csv', header = T)
+work <- read.csv('Data_Cleaning/data_work.csv', header = T)
 
 # Focus on south Europe
 work <- work[work$rgn == 'South Europe', ]
@@ -20,7 +15,6 @@ country <-  levels(work$cntry)
 
 # Merge native and autochthonous
 work$ctzmod[work$ctzmod == 'native'] <- 'autochthonous'
-
 
 
 #### Define the weights design ####
@@ -40,14 +34,6 @@ gender.south <- gender.south.tab[,2]/rowSums(gender.south.tab)*100
 # 66.59818 81.20397 
 
 rm(gender.south.tab)
-
-# COMMENT ......................................................................
-#
-#
-# There is a drop of 15% switching from men to women
-#
-#
-
 
 
 #### gndr: Difference between countries ####
@@ -87,16 +73,6 @@ legend('bottomleft', legend = rownames(gender.south.country),
        border = NA, 
        cex = 1.2,
        bty = 'n')
-
-
-# COMMENT ......................................................................
-#
-#
-# Here I see a difference only on the intercept.
-# 
-#                  => I WOULD NOT CONSIDER A SIMPLE COUNTRY-GENDER RELATIONSHIP.
-#
-#
 
 rm(cnt)
 

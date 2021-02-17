@@ -31,18 +31,11 @@ svyhist(~agea, design, col = 'gold')
 svyhist(~agea, subset(design, gndr == 'male'), col = rgb(0,0,1,0.2))
 svyhist(~agea, subset(design, gndr == 'female'), col = rgb(1,0,0,0.2), add = T)
 
-
-# COMMENT ......................................................................
-#
-#
-# Ages are distributed quite similarly between men and women,
-# nothing real to point out here.
-#
-#
+# par(mfrow = c(1,1))
+# svyhist(~agea, design, col = 'gold', main = '', xlab = 'age', ylab = '')
 
 
-
-### Age in relation with employment status and gender ####
+#### Age in relation with employment status and gender ####
 
 age.temp <- svytable(~agea+pdwrk, design = design)
 age.male.temp <- svytable(~agea+pdwrk, design = subset(design, gndr == 'male'))
@@ -96,25 +89,7 @@ mtext('Women', side=3, line = 1)
 mtext('Occupation rate in South Europe by age', outer = T, side=3, line = -1)
 
 
-# COMMENT ......................................................................
-#
-#
-# Overall, I don't see a real trend suggesting the employment chances change with age,
-# except for the situation before and after the 30s.
-# In particular, men and women are equal before the 30,
-# but after men stabilize while women have some changes in distribution.
-#
-# Maybe we could consider these data ONLY FOR WOMEN,
-# and instead of just give the model the age as it is
-# (there is clearly no linear relationship between age and response)
-# we can say to the model to compute the difference between say the 40s
-# and the actual age, penalizing women which are far from this threshold.
-#
-#
-
-
-
-### Age in relation with employment status and gender for each country ####
+#### Age in relation with employment status and gender for each country ####
 
 age.south <- age.south.male <- age.south.female <- NULL
 for( cnt in country){
@@ -165,20 +140,6 @@ colnames(age.south.male) <- country
 colnames(age.south.female) <- country
 
 
-
-# PLOT
-# 
-# par(mfrow = c(1,1))
-# plot(1:6, age, col = 'gold', type = 'l', lwd = 3, ylim = c(0,100))
-# points(1:6, age.male, col = 'dodgerblue3', type = 'l', lwd = 4)
-# points(1:6, age.female, col = 'red', type = 'l', lwd = 4)
-# for(i in 1:dim(age.south)[1]){
-#   points(1:6, age.south[,i], col = 'yellow', type = 'l')
-#   points(1:6, age.south.male[,i], col = 'dodgerblue3', type = 'l')
-#   points(1:6, age.south.female[,i], col = 'red', type = 'l')
-# }
-
-
 par(mfrow = c(2,3))
 for(i in 1:length(country)){
   barplot(age.south[,i],
@@ -202,22 +163,7 @@ for(i in 1:length(country)){
 }
 
 
-# COMMENT ......................................................................
-#
-#
-# Men and women tend to be differently distributed,
-# and this distribution is not much constant in each country.
-# However, it is not clear to me if the difference is enough,
-# to justify a different model for age and country together,
-#
-#
-#           => I WOULD PROBABLY DIVIDE MEN AND WOMEN, BUT NOT THE COUNTRY HERE.
-#
-#
-
-
-
-### A final look to women ####
+#### A final look to women ####
 
 age.female.temp <- svytable(~agea+pdwrk, design = subset(design, gndr == 'female'))
 age.female.tot <- age.female.temp[,2]/rowSums(age.female.temp) * 100
@@ -234,17 +180,6 @@ barplot(age.female,
         names.arg = c('25-29','30-34','35-39','40-44','45-49','50-55'),
         las = 2)
 
-
-
-# COMMENT ......................................................................
-#
-#
-# Avoiding the categories, the pattern that seems to be in the first plays disappears,
-# leaving something difficult to interpret.
-#
-# Overall, I don't know how a glm can correctly deal with this.
-#
-#
 
 rm(age.temp, age.male.temp, age.female.temp, i, cnt)
 
