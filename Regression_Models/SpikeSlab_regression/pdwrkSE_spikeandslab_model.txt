@@ -1,0 +1,45 @@
+model{
+	for(i in 1:n){   ## regression model for y  #loop 
+	
+	     	mu[i] <- beta %*% z[i,] +  theta%*%z.f[i,] * female[i]
+			 + alpha%*% z.p[i,] * partner[i]
+			
+	     
+	     	y[i] ~ dbern(p[i])
+	     	probit(p[i]) = mu[i]
+
+		loglik[i] <- y[i]/p[i] - (1-y[i])/(1-p[i])	# log-likelihood of Bernoulli distribution
+
+	}
+		
+
+	for(i in 1:n.z){  
+		
+	     	beta_temp[i] ~ dnorm(0,.01)
+		gamma.b[i] ~ dbern(lambda.b[i])
+		lambda.b[i] ~ dunif(0,1)
+		beta[i] <- gamma.b[i] * beta_temp[i]  
+
+	}
+
+	for(i in 1:n.z.f){   
+	
+	     	theta_temp[i] ~ dnorm(0,.01)
+		gamma.t[i] ~ dbern(lambda.t[i])
+		lambda.t[i] ~ dunif(0,1)
+		theta[i] <- gamma.t[i] * theta_temp[i]  
+
+	}
+
+	for(i in 1:n.z.p){   
+
+	     	alpha_temp[i] ~ dnorm(0,.01)
+		gamma.a[i] ~ dbern(lambda.a[i])
+		lambda.a[i] ~ dunif(0,1)
+		alpha[i] <- gamma.a[i] * alpha_temp[i]  
+
+	}
+
+
+
+}
