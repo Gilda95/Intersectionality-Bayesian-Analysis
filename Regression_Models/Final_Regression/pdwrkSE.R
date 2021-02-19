@@ -83,9 +83,9 @@ partner <- ifelse(data$prtnr == '1', 1, 0)
 
 
 #### Model matrix ####
-y <- data$pdwrk
-z <- data[, c('agea', 'chld14', 'edutre', 'prtnr')]
-z.f <- data[, c('chld14', 'ctzmod', 'prtnr', 'edutre')]
+y <- data$pdwrk # response
+z <- data[, c('agea', 'chld14', 'edutre', 'prtnr')] # beta
+z.f <- data[, c('chld14', 'ctzmod', 'prtnr', 'edutre')] # theta (female)
 
 ## standardize continuous variables
 # z$agea <- scale(z$agea)
@@ -131,7 +131,7 @@ outputRegress <- jags.parfit(cl = cl, data = data, params = variable.names,
 stopCluster(cl)
 time.taken <- proc.time() - timer
 
-# save(outputRegress, time.taken, file='Regression_Models/Final_regression/pdwrkSE_output.Rdata')
+# save(outputRegress, time.taken, z, z.f, file='Regression_Models/Final_regression/pdwrkSE_output.Rdata')
 
 load('Regression_Models/Final_regression/pdwrkSE_output.Rdata')
 
